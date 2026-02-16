@@ -1,62 +1,67 @@
 <div class="login">
-   
+  <form class="login__form" (ngSubmit)="login()">
+    <h1 class="login__title">Login</h1>
 
-   <form class="login__form" (ngSubmit)="login()">
-      <h1 class="login__title">Login</h1>
+    <!-- Mensajes de éxito y error -->
+    <div *ngIf="successMsg" class="login__message success">
+      {{ successMsg }}
+    </div>
+    <div *ngIf="errorMsg" class="login__message error">
+      {{ errorMsg }}
+    </div>
 
-      <div class="login__content">
-
-         <div class="login__box">
-            <i class="ri-user-3-line login__icon"></i>
-            <div class="login__box-input">
-               <input
-                 type="email"
-                 class="login__input"
-                 name="email"
-                 [(ngModel)]="email"
-                 required
-                 placeholder=" ">
-               <label class="login__label">Email</label>
-            </div>
-         </div>
-
-         <div class="login__box">
-            <i class="ri-lock-2-line login__icon"></i>
-            <div class="login__box-input">
-               <input
-                 [type]="showPass ? 'text' : 'password'"
-                 class="login__input"
-                 name="password"
-                 [(ngModel)]="password"
-                 required
-                 placeholder=" ">
-               <label class="login__label">Password</label>
-
-               <i
-                 class="login__eye"
-                 [class.ri-eye-line]="showPass"
-                 [class.ri-eye-off-line]="!showPass"
-                 (click)="togglePass()">
-               </i>
-            </div>
-         </div>
-
+    <div class="login__content">
+      <div class="login__box">
+        <i class="ri-user-3-line login__icon"></i>
+        <div class="login__box-input">
+          <input
+            type="email"
+            class="login__input"
+            name="email"
+            [(ngModel)]="email"
+            required
+            placeholder=" "
+          />
+          <label class="login__label">Email</label>
+        </div>
       </div>
 
-      <div class="login__check">
-         <div class="login__check-group">
-            <input type="checkbox" class="login__check-input">
-            <label class="login__check-label">Remember me</label>
-         </div>
-
-         <a href="#" class="login__forgot">Forgot Password?</a>
+      <div class="login__box">
+        <i class="ri-lock-2-line login__icon"></i>
+        <div class="login__box-input">
+          <input
+            [type]="showPass ? 'text' : 'password'"
+            class="login__input"
+            name="password"
+            [(ngModel)]="password"
+            required
+            placeholder=" "
+          />
+          <label class="login__label">Password</label>
+          <i
+            class="login__eye"
+            [class.ri-eye-line]="showPass"
+            [class.ri-eye-off-line]="!showPass"
+            (click)="togglePass()"
+          ></i>
+        </div>
       </div>
+    </div>
 
-      <button type="submit" class="login__button">Login</button>
+    <div class="login__check">
+      <div class="login__check-group">
+        <input type="checkbox" class="login__check-input" />
+        <label class="login__check-label">Remember me</label>
+      </div>
+      <a href="#" class="login__forgot">Forgot Password?</a>
+    </div>
 
-      <p class="login__register">
-         Don't have an account? <a href="#">Register</a>
-      </p>
+    <button type="submit" class="login__button" [disabled]="loading">
+      {{ loading ? 'Ingresando...' : 'Login' }}
+    </button>
 
-   </form>
+    <p class="login__register">
+      Don't have an account? <a href="#">Register</a>
+    </p>
+  </form>
 </div>
