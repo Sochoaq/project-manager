@@ -1,0 +1,19 @@
+# Node
+node_modules
+*/node_modules
+
+# Angular
+dist
+.angular
+.cache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db
