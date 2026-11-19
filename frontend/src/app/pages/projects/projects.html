@@ -1,0 +1,182 @@
+<div class="pm-shell">
+  <header class="pm-header">
+    <div>
+      <h1 class="pm-title">Project Portfolio Workspace</h1>
+      <p class="pm-subtitle">Structured milestone execution and completion telemetry</p>
+    </div>
+    <button type="button" class="pm-btn pm-btn-ghost" (click)="logout()">Sign Out</button>
+  </header>
+
+  <section class="pm-kpi-grid" aria-label="Portfolio Metrics">
+    <article class="pm-kpi-card">
+      <span class="pm-kpi-label">Total Projects</span>
+      <strong class="pm-kpi-value">{{ stats.total }}</strong>
+    </article>
+    <article class="pm-kpi-card">
+      <span class="pm-kpi-label">In Progress</span>
+      <strong class="pm-kpi-value pm-accent">{{ stats.byStatus.IN_PROGRESS }}</strong>
+    </article>
+    <article class="pm-kpi-card">
+      <span class="pm-kpi-label">Completed</span>
+      <strong class="pm-kpi-value pm-success">{{ stats.byStatus.COMPLETED }}</strong>
+    </article>
+    <article class="pm-kpi-card">
+      <span class="pm-kpi-label">Avg. Completion</span>
+      <strong class="pm-kpi-value">{{ stats.averageProgress }}%</strong>
+    </article>
+  </section>
+
+  <div *ngIf="errorMsg" class="pm-alert" role="alert">{{ errorMsg }}</div>
+
+  <section class="pm-layout">
+    <form class="pm-panel pm-form" (ngSubmit)="createProject()">
+      <h2 class="pm-panel-title">New Project</h2>
+
+      <label class="pm-field">
+        <span>Title</span>
+        <input
+          type="text"
+          name="title"
+          [(ngModel)]="newProject.title"
+          placeholder="e.g. Kubernetes CI/CD Migration"
+          required
+        />
+      </label>
+
+      <label class="pm-field">
+        <span>Description</span>
+        <textarea
+          name="description"
+          rows="3"
+          [(ngModel)]="newProject.description"
+          placeholder="Scope, key deliverables, and success criteria"
+          required
+        ></textarea>
+      </label>
+
+      <div class="pm-row">
+        <label class="pm-field">
+          <span>Priority</span>
+          <select name="priority" [(ngModel)]="newProject.priority">
+            <option value="LOW">LOW</option>
+            <option value="MEDIUM">MEDIUM</option>
+            <option value="HIGH">HIGH</option>
+          </select>
+        </label>
+
+        <label class="pm-field">
+          <span>Target Date</span>
+          <input type="date" name="targetDate" [(ngModel)]="newProject.targetDate" />
+        </label>
+      </div>
+
+      <button type="submit" class="pm-btn pm-btn-primary" [disabled]="submitting">
+        {{ submitting ? 'Creating...' : 'Create Project' }}
+      </button>
+    </form>
+
+    <div class="pm-panel">
+      <div class="pm-toolbar">
+        <h2 class="pm-panel-title">Active Backlog</h2>
+        <div class="pm-tabs" role="tablist">
+          <button
+            type="button"
+            class="pm-tab"
+            [class.active]="activeFilter === 'ALL'"
+            (click)="setFilter('ALL')"
+          >
+            All
+          </button>
+          <button
+            type="button"
+            class="pm-tab"
+            [class.active]="activeFilter === 'PLANNED'"
+            (click)="setFilter('PLANNED')"
+          >
+            Planned
+          </button>
+          <button
+            type="button"
+            class="pm-tab"
+            [class.active]="activeFilter === 'IN_PROGRESS'"
+            (click)="setFilter('IN_PROGRESS')"
+          >
+            In Progress
+          </button>
+          <button
+            type="button"
+            class="pm-tab"
+            [class.active]="activeFilter === 'COMPLETED'"
+            (click)="setFilter('COMPLETED')"
+          >
+            Completed
+          </button>
+        </div>
+      </div>
+
+      <p *ngIf="loading" class="pm-muted">Synchronizing projects...</p>
+      <p *ngIf="!loading && projects.length === 0" class="pm-muted">
+        No projects match the selected filter. Create a project on the left to begin tracking.
+      </p>
+
+      <div class="pm-list" *ngIf="!loading && projects.length > 0">
+        <article class="pm-card" *ngFor="let item of projects">
+          <div class="pm-card-top">
+            <div>
+              <h3>{{ item.title }}</h3>
+              <p class="pm-card-desc">{{ item.description }}</p>
+            </div>
+            <span class="pm-badge" [attr.data-priority]="item.priority">{{ item.priority }}</span>
+          </div>
+
+          <div class="pm-progress-row">
+            <div class="pm-progress-track">
+              <div class="pm-progress-fill" [style.width.%]="item.progress"></div>
+            </div>
+            <span class="pm-progress-pct">{{ item.progress }}%</span>
+          </div>
+
+          <div class="pm-card-actions">
+            <div class="pm-status-controls">
+              <button
+                type="button"
+                class="pm-chip"
+                [class.active]="item.status === 'PLANNED'"
+                (click)="updateStatus(item, 'PLANNED')"
+              >
+                Planned
+              </button>
+              <button
+                type="button"
+                class="pm-chip"
+                [class.active]="item.status === 'IN_PROGRESS'"
+                (click)="updateStatus(item, 'IN_PROGRESS')"
+              >
+                In Progress
+              </button>
+              <button
+                type="button"
+                class="pm-chip"
+                [class.active]="item.status === 'COMPLETED'"
+                (click)="updateStatus(item, 'COMPLETED')"
+              >
+                Completed
+              </button>
+            </div>
+
+            <div class="pm-right-actions">
+              <span *ngIf="item.targetDate" class="pm-date">Due {{ item.targetDate }}</span>
+              <button
+                type="button"
+                class="pm-btn pm-btn-danger"
+                (click)="deleteProject(item.id)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</div>
