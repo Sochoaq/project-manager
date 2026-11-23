@@ -1,0 +1,43 @@
+name: Full-Stack Verification & Multi-Stage Docker CI
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check backend syntax
+        run: |
+          node --check backend/src/app.js
+          node --check backend/src/index.js
+          node --check backend/src/controllers/auth.controller.js
+          node --check backend/src/controllers/project.controller.js
+
+      - name: Validate Docker Compose specification
+        run: docker compose config --quiet
+
+      - name: Build multi-stage backend & frontend containers
+        run: |
+          docker build -t project-manager-backend:ci ./backend
+          docker build -t project-manager-frontend:ci ./frontend
+
+      - name: Verify non-root execution & API /health endpoint
+        run: |
+          test "$(docker run --rm --entrypoint id project-manager-backend:ci -u)" = "1000"
+          test "$(docker run --rm --entrypoint id project-manager-frontend:ci -u)" = "101"
+          docker run -d --name pm-api-ci -p 13000:3000 --read-only --tmpfs /tmp project-manager-backend:ci
+          sleep 2
+          curl -fsS http://127.0.0.1:13000/health
+          docker rm -f pm-api-ci

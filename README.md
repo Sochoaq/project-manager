@@ -88,3 +88,17 @@ cd frontend
 npm install
 npm start
 ```
+
+---
+
+## Containerized Deployment (Docker Compose)
+
+Run the full three-tier stack (`Angular / Nginx Unprivileged` -> `Express API` -> `PostgreSQL 16`) with multi-stage builds, non-root users (`UID 101` / `UID 1000`), and automated healthchecks:
+
+```bash
+docker compose up --build
+```
+
+* **Web UI (Angular 21 + Unprivileged Nginx):** `http://localhost:4200`
+* **REST API & Healthcheck (Node 22 Alpine, read-only rootfs):** `http://localhost:3000/health`
+* **Database:** PostgreSQL 16 initialized automatically via [`db/init.sql`](db/init.sql)
